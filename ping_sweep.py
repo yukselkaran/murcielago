@@ -1,6 +1,7 @@
 import subprocess
 import threading
 from subnet_calc import analyze_cidr, ip_to_int, int_to_ip
+from icmp_ping import ping_host
 
 def is_host_alive(ip_str):
     result = subprocess.run(
@@ -13,7 +14,7 @@ def is_host_alive(ip_str):
     else:
         return False
     
-def scan_subnet(cidr_str):
+def scan_subnet(cidr_str,method="subprocess"):
     result = analyze_cidr(cidr_str)
     first_host = result["first_host"]
     last_host = result["last_host"]
@@ -24,15 +25,20 @@ def scan_subnet(cidr_str):
     threads = []
     for ip_int in range(first_int,last_int + 1):
         ip_str = int_to_ip(ip_int)
-        t = threading.Thread(target=worker,args=(ip_str,alive_hosts,lock))
+        t = threading.Thread(target=worker,args=(ip_str,alive_hosts,lock,method))
         threads.append(t)
         t.start()
     for t in threads:
         t.join()
     return alive_hosts
 
-def worker(ip_str, alive_list, lock):
-    if is_host_alive(ip_str):
+def worker(ip_str, alive_list, lock,method):
+    if method == "icmp":
+        alive = ping_host(ip_str)
+    else:
+        alive = is_host_alive(ip_str)
+
+    if alive:
         with lock:
             alive_list.append(ip_str)
 
@@ -43,3 +49,9 @@ if __name__ == "__main__":
     print("\nTarama başlıyor...")
     alive_hosts = scan_subnet("192.168.1.0/24")   # kendi ağına göre değiştir
     print("Canlı host'lar:", alive_hosts)
+
+    print("subprocess ile:")
+    print(scan_subnet("192.168.1.0/24"))
+    
+    print("icmp ile:")
+    print(scan_subnet("192.168.1.0/24", method="icmp"))

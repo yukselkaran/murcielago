@@ -24,9 +24,17 @@ def ping_host(ip_str,timeout=1):
     pkt = create_packet(identifier,sequence)
     sock.sendto(pkt, (ip_str,0))
     try:
-        sock.recvfrom(1024)
-        return True
+        data, addr = sock.recvfrom(1024)
+        if addr[0] != ip_str:
+            return False
+        icmp_header = data[20:28]
+        r_type,r_code,r_checksum,r_id,r_seq = struct.unpack("!BBHHH",icmp_header)
+        if r_id == identifier:
+            return True
+        return False
     except socket.timeout:
+        return False
+    except OSError:
         return False
     finally:
         sock.close()
