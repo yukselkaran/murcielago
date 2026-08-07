@@ -1,4 +1,5 @@
 import argparse
+import sys
 from subnet_calc import analyze_cidr
 from ping_sweep import scan_subnet
 from arp_scan import arp_scan
@@ -17,15 +18,25 @@ def main():
 
     if args.scan:
         print(f"\n=== Tarama ({args.scan}) ===")
-        if args.scan == "arp":
-            result = arp_scan(args.cidr)
-            for ip, mac in result.items():
-                print(f"{ip} -> {mac}")
-        else:
-            alive = scan_subnet(args.cidr, method=args.scan)
-            for ip in alive:
-                print(ip)
+        try:
+            if args.scan == "arp":
+                result = arp_scan(args.cidr)
 
+                for ip, mac in result.items():
+                    print(f"{ip} -> {mac}")
+
+            else:
+                alive = scan_subnet(
+                    args.cidr,
+                    method=args.scan
+                )
+
+                for ip in alive:
+                    print(ip)
+
+        except PermissionError as error:
+            print(f"Error: {error}", file=sys.stderr)
+            sys.exit(1)
 
 if __name__ == "__main__":
     main()
