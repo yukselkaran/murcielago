@@ -4,7 +4,6 @@ import os
 import time
 
 def checksum(data):
-    # DEĞİŞMEDİ
     summation = 0
     for i in range(0, len(data) - 1, 2):
         summation += (data[i] << 8) + data[i + 1]
@@ -15,7 +14,6 @@ def checksum(data):
     return ~summation & 0xFFFF
 
 def create_packet(identifier, sequence):
-    # DEĞİŞMEDİ
     header = struct.pack("!BBHHH", 8, 0, 0, identifier, sequence)
     chksum = checksum(header)
     return struct.pack("!BBHHH", 8, 0, chksum, identifier, sequence)
@@ -23,7 +21,9 @@ def create_packet(identifier, sequence):
 def send_ping(sock, ip_str, identifier, sequence):
     pkt = create_packet(identifier, sequence)
     sock.sendto(pkt, (ip_str, 0))
-
+#########################################
+# BU YÖNTEM ÇOK GÜZEL, GELİŞTİRİLEBİLİR #
+#########################################
 def receive_pings(sock, pending, duration=2):
     alive = []
     deadline = time.time() + duration

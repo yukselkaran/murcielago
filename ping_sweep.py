@@ -45,11 +45,11 @@ def is_host_alive(ip_str, timeout=1):
 
     result = subprocess.run(
         cmd,
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL
+        stdout=subprocess.DEVNULL, # outputları terminal ekranına yazdırmamak için
+        stderr=subprocess.DEVNULL # errorları terminal ekranına yazdırmamak için
     )
 
-    return result.returncode == 0
+    return result.returncode == 0 # başarılı çalıştığında return 0 döndürür genel zaten c++ta da aynı 
 
 
 def scan_subnet_icmp(cidr_str):
@@ -71,7 +71,7 @@ def scan_subnet_icmp(cidr_str):
 
     try:
         identifier = os.getpid() & 0xFFFF
-        pending = {}
+        pending = {} # IP ler ile seq numaralarını eşleştiriyor.
 
         sequence = 0
 

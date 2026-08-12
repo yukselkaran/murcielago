@@ -61,8 +61,10 @@ def get_host_range(network_int, broadcast_int, prefix_len):
 
 def analyze_cidr(cidr_str):
     cidr_elements = cidr_str.split("/")
+
     prefix_len = int(cidr_elements[1])
     ip_int = ip_to_int(cidr_elements[0])
+
     mask_int = cidr_to_mask_int(prefix_len)
     network_int = get_network(ip_int,mask_int)
     broadcast_int = get_broadcast(network_int,mask_int)
@@ -88,45 +90,3 @@ def analyze_cidr(cidr_str):
         'host_count' : host_count
     }
     return result
-
-if __name__ == "__main__":
-    print(ip_to_int("192.168.1.10"))   # 3232235786 bekleniyor
-    print(int_to_ip(3232235786))         # "192.168.1.10" bekleniyor
-    print("\n")
-
-    print(int_to_ip(cidr_to_mask_int(24)))   # "255.255.255.0" beklenir
-    print(int_to_ip(cidr_to_mask_int(16)))   # "255.255.0.0" beklenir
-    print(int_to_ip(cidr_to_mask_int(8)))     # "255.0.0.0" beklenir
-    print(int_to_ip(cidr_to_mask_int(0)))     # "0.0.0.0" beklenir
-    print(int_to_ip(cidr_to_mask_int(32)))   # "255.255.255.255" beklenir
-    print("\n")
-
-    ip = ip_to_int("192.168.1.10")
-    mask = cidr_to_mask_int(24)
-    network = get_network(ip,mask)
-    print(int_to_ip(network))   # "192.168.1.0" beklenir
-    print("\n")
-
-    ip2 = ip_to_int("10.5.130.7")
-    mask2 = cidr_to_mask_int(22)
-    network2 = get_network(ip2, mask2)
-    print(int_to_ip(network2))   # "10.5.128.0" beklenir
-    print("\n")
-
-    network = get_network(ip_to_int("192.168.1.10"), cidr_to_mask_int(24))
-    mask = cidr_to_mask_int(24)
-    broadcast = get_broadcast(network, mask)
-    print(int_to_ip(broadcast))   # "192.168.1.255" beklenir
-    print("\n")
-
-    print(get_host_count(31))   # 2 beklenir
-    print(get_host_count(32))   # 1 beklenir
-    print("\n")
-
-    network31 = get_network(ip_to_int("192.168.1.0"), cidr_to_mask_int(31))
-    broadcast31 = get_broadcast(network31, cidr_to_mask_int(31))
-    first, last = get_host_range(network31, broadcast31, 31)
-    print(int_to_ip(first), "-", int_to_ip(last))   # "192.168.1.0 - 192.168.1.1" beklenir
-    print("\n")
-
-    print(analyze_cidr("192.168.1.0/32"))
